@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 public class LipsyncController : MonoBehaviour
 {
@@ -61,6 +61,11 @@ public class LipsyncController : MonoBehaviour
 	/// Only used if Ignore Distance is checked
 	/// </summary>
 	public float minVol = .25f, maxVol = 10.0f;
+	private float lastMoveValue;
+	/// <summary>
+	/// Speed at which the mouth will move towards the next required position/shape for blending purposes
+	/// </summary>
+	public float mouthMoveSpeed = 200.0f;
 	/// <summary>
 	/// Mouth Shape ID
 	/// </summary>
@@ -252,12 +257,16 @@ public class LipsyncController : MonoBehaviour
 	{
 		if (!skinnedMeshRenderer)
 			return;
-		float movement = MovingAverage(CalcSpectrum(frqLow, frqHigh));
+		float movement = CalcSpectrum(frqLow, frqHigh);
 		if (ignoreDistance)
 		{
 			movement += movement * Vector3.Distance(mouthSource.transform.position, Camera.main.transform.position) * volByDistance;
 		}
-		skinnedMeshRenderer.SetBlendShapeWeight(shapeID, movement * volume);
+		float movementValue = Mathf.Clamp(movement * volume, 0, 100);
+		lastMoveValue = Mathf.MoveTowards(lastMoveValue, movementValue, mouthMoveSpeed * Time.deltaTime);
+		skinnedMeshRenderer.SetBlendShapeWeight(shapeID, lastMoveValue);
+		//skinnedMeshRenderer.SetBlendShapeWeight(shapeID, movement * volume);
+
 	}
 	/// <summary>
 	/// Update jaw bone for mouth movement
