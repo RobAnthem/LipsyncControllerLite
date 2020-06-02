@@ -20,6 +20,7 @@ public class LipsyncController : MonoBehaviour
 	/// </summary>
 	public FFTWindow analysisType = FFTWindow.Rectangular;
 	public AudioSource mouthSource;
+	public float VolumeControl = 3.0f;
 	/// <summary>
 	/// Movement axis for up/down movement of jaw
 	/// </summary>
@@ -260,7 +261,7 @@ public class LipsyncController : MonoBehaviour
 		float movement = CalcSpectrum(frqLow, frqHigh);
 		if (ignoreDistance)
 		{
-			movement += movement * Vector3.Distance(mouthSource.transform.position, Camera.main.transform.position) * volByDistance;
+			movement += movement * Vector3.Distance(mouthSource.transform.position, Camera.main.transform.position) * volByDistance * VolumeControl;
 		}
 		float movementValue = Mathf.Clamp(movement * volume, 0, 100);
 		lastMoveValue = Mathf.MoveTowards(lastMoveValue, movementValue, mouthMoveSpeed * Time.deltaTime);
